@@ -1,0 +1,91 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: linear-gradient(to right, black, darkblue);
+}
+.container {
+    background-color: rgba(0, 0, 0, 0.45); 
+    border: 2px solid darkblue; 
+    border-radius: 20px; 
+    padding: 20px;
+    margin: 0 10%; 
+    max-width: 100%;
+}
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 10px;
+    border: 4px solid darkblue; 
+    border-radius: 7.5px;
+    margin-right: 10px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.search-button {
+    padding: 10px 20px;
+    background-color: skyblue; 
+    border: 4px solid darkblue; 
+    border-radius: 7.5px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+}
+
+.search-button:hover {
+    background-color: lightblue; 
+}
+.pagination {
+    
+   
+    
+    padding: 20px;
+    margin: 0 10%; 
+    max-width: 100%;
+}
+.page-number {
+    margin: 0 3px;
+    padding: 5px 10px;
+    color: white;
+    background-color: black;
+    border: 1px solid lightblue;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.page-number:hover {
+    background-color: skyblue;
+}
+.list-item {
+  
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+
+.list-content {
+color: #fff;
+margin-bottom: 10px;
+display: flex; /* Added */
+justify-content: space-between; /* Added */
+align-items: center;
+}
+
+.button {
+background-color: #007bff;
+color: #fff;
+padding: 8px 16px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+
+transition: background-color 0.3s;
+}
+
+.button:hover {
+background-color: #0056b3;
+}

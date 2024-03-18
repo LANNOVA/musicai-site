@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0xMusic List</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="icon" href="images/icon.png" type="image/x-icon">
+</head>
+<body>
+    <div align="center">
+        <img src="https://music0x.com/img/logo/logo.png" alt="foff" width="270" height="71.25">
+    </div> <br>
+    <div class="container">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search..." id="searchInput">
+            <button class="search-button" onclick="searchModels()">Search</button>
+        </div>
+        <div id="modelList"></div>
+        
+    </div>
+    <div class="pagination" align="middle" id="pagination"></div>
+    <script>
+        let modelsData = [];
+        let currentPage = 1;
+        let currentSearchData = [];
+        const itemsPerPage = 10;
+
+        function fetchModelsData() {
+            fetch('voice_models.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    modelsData = csvData.split('\n').map(row => row.trim().split(','));
+                    displayModels(modelsData);
+                });
+        }
+
+        function displayModels(data) {
+            const startIndex = (currentPage - 1) * itemsPerPage + 1;
+            const endIndex = startIndex + itemsPerPage - 1;
+            const paginatedData = data.slice(startIndex, endIndex + 1);
+
+            const modelListDiv = document.getElementById('modelList');
+            modelListDiv.innerHTML = '';
+
+            paginatedData.forEach(model => {
+                const modelName = model[0];
+                const modelLink = model[1];
+
+                const modelDiv = document.createElement('div');
+                modelDiv.classList.add('list-item');
+
+                const modelContentDiv = document.createElement('div');
+                modelContentDiv.classList.add('list-content');
+
+                const modelNameSpan = document.createElement('span');
+                modelNameSpan.textContent = modelName;
+                modelNameSpan.style.color = 'white';
+
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy';
+                copyButton.classList.add('button', 'copy-button');
+                copyButton.onclick = function() {
+                    copyToClipboard(modelLink);
+                };
+
+                modelContentDiv.appendChild(modelNameSpan);
+                modelContentDiv.appendChild(copyButton);
+                modelDiv.appendChild(modelContentDiv);
+                modelListDiv.appendChild(modelDiv);
+            });
+
+            renderPagination(data.length);
+        }
+
+        function renderPagination(totalItems) {
+            const numPages = Math.ceil((totalItems - 1) / itemsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            paginationDiv.innerHTML = '';
+
+            if (currentPage > 5) {
+                const prevPageButton = document.createElement('span');
+                prevPageButton.textContent = '<';
+                prevPageButton.classList.add('page-number');
+                prevPageButton.onclick = function() {
+                    currentPage -= 5;
+                    renderPagination(totalItems);
+                };
+                paginationDiv.appendChild(prevPageButton);
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(startPage + 4, numPages);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('span');
+                pageButton.textContent = i;
+                pageButton.classList.add('page-number');
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                }
+                pageButton.onclick = function() {
+                    currentPage = i;
+                    if (currentSearchData.length > 0) {
+                        displayModels(currentSearchData);
+                    } else {
+                        displayModels(modelsData);
+                    }
+                };
+                paginationDiv.appendChild(pageButton);
+            }
+
+            if (currentPage < numPages && numPages > 5) {
+                const nextPageButton = document.createElement('span');
+                nextPageButton.textContent = '>';
+                nextPageButton.classList.add('page-number');
+                nextPageButton.onclick = function() {
+                    currentPage += 5;
+                    renderPagination(totalItems);
+                };
+                paginationDiv.appendChild(nextPageButton);
+            }
+        }
+
+        function searchModels() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            currentSearchData = modelsData.filter(model => model[0].toLowerCase().includes(searchTerm));
+            currentPage = 1;
+            displayModels(currentSearchData);
+        }
+
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert('URL copied to clipboard!');
+        }
+
+        window.onload = fetchModelsData;
+    </script>
+</body>
+</html>
