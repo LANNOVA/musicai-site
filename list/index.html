@@ -101,7 +101,7 @@
                 pageButton.textContent = i;
                 pageButton.classList.add('page-number');
                 if (i === currentPage) {
-                    pageButton.classList.add('active'); // Highlight current page
+                    pageButton.classList.add('active');
                 }
                 pageButton.onclick = function() {
                     currentPage = i;
@@ -110,7 +110,7 @@
                     } else {
                         displayModels(modelsData);
                     }
-                    renderPagination(totalItems); // Update pagination after click
+                    renderPagination(totalItems); 
                 };
                 paginationDiv.appendChild(pageButton);
             }
@@ -143,7 +143,12 @@
             document.body.removeChild(el);
             alert('URL copied to clipboard!');
         }
-
+        document.getElementById('searchInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                searchModels(); 
+            }
+        });
         window.onload = fetchModelsData;
     </script>
 </body>
