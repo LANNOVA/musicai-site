@@ -14,7 +14,7 @@
     <div class="container">
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Search..." id="searchInput">
-            <button class="search-button" onclick="searchModels()">Search</button><br>
+            <button class="search-button" onclick="searchModels()">Search</button>
         </div><br><br>
         <div id="modelList"></div>
         
@@ -97,7 +97,7 @@
                 pageButton.textContent = i;
                 pageButton.classList.add('page-number');
                 if (i === currentPage) {
-                    pageButton.classList.add('active');
+                    pageButton.classList.add('active'); // Highlight current page
                 }
                 pageButton.onclick = function() {
                     currentPage = i;
@@ -106,6 +106,7 @@
                     } else {
                         displayModels(modelsData);
                     }
+                    renderPagination(totalItems); // Update pagination after click
                 };
                 paginationDiv.appendChild(pageButton);
             }
