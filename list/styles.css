@@ -95,3 +95,9 @@ background-color: #0056b3;
     padding: 5px 10px;
     border-radius: 5px;
 }
+.model-name {
+  font-family: "Thasadith", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  color: #000; 
+}
