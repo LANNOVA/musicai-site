@@ -128,20 +128,43 @@
         }
 
         function searchModels() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            currentSearchData = modelsData.filter(model => model[0].toLowerCase().includes(searchTerm));
-            // Sort the results based on relevance
-            currentSearchData.sort((a, b) => {
-                const aIndex = a[0].toLowerCase().indexOf(searchTerm);
-                const bIndex = b[0].toLowerCase().indexOf(searchTerm);
-                if (aIndex === bIndex) {
-                    return a[0].localeCompare(b[0]);
-                }
-                return aIndex - bIndex;
-            });
-            currentPage = 1;
-            displayModels(currentSearchData);
+    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (searchTerm === '') {
+        displayModels(modelsData);
+        return;
+    }
+    
+    currentSearchData = modelsData.filter(model => {
+        const modelWords = model[0].toLowerCase().split(' ');
+        return modelWords.includes(searchTerm);
+    });
+    
+ 
+    currentSearchData.sort((a, b) => {
+        const aMatchCount = a[0].toLowerCase().split(' ').filter(word => word.includes(searchTerm)).length;
+        const bMatchCount = b[0].toLowerCase().split(' ').filter(word => word.includes(searchTerm)).length;
+
+        
+        if (aMatchCount !== bMatchCount) {
+            return bMatchCount - aMatchCount; 
+        } else {
+            
+            const aIndex = a[0].toLowerCase().indexOf(searchTerm);
+            const bIndex = b[0].toLowerCase().indexOf(searchTerm);
+
+    
+            if (aIndex === bIndex) {
+                return a[0].localeCompare(b[0]);
+            }
+            return aIndex - bIndex;
         }
+    });
+    
+    currentPage = 1;
+    displayModels(currentSearchData);
+}
+
+
 
         function copyToClipboard(text) {
             const el = document.createElement('textarea');
@@ -152,12 +175,14 @@
             document.body.removeChild(el);
             alert('URL copied to clipboard!');
         }
+
         document.getElementById('searchInput').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault(); 
                 searchModels(); 
             }
         });
+
         window.onload = fetchModelsData;
     </script>
 </body>
