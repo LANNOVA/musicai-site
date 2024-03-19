@@ -33,15 +33,15 @@
             fetch('voice_models.csv')
                 .then(response => response.text())
                 .then(csvData => {
-                    modelsData = csvData.split('\n').map(row => row.trim().split(','));
+                    modelsData = csvData.split('\n').slice(1).map(row => row.trim().split(','));
                     displayModels(modelsData);
                 });
         }
 
         function displayModels(data) {
-            const startIndex = (currentPage - 1) * itemsPerPage + 1;
-            const endIndex = startIndex + itemsPerPage - 1;
-            const paginatedData = data.slice(startIndex, endIndex + 1);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = data.slice(startIndex, endIndex);
 
             const modelListDiv = document.getElementById('modelList');
             modelListDiv.innerHTML = '';
@@ -78,16 +78,21 @@
         }
 
         function renderPagination(totalItems) {
-            const numPages = Math.ceil((totalItems - 1) / itemsPerPage);
+            const numPages = Math.ceil(totalItems / itemsPerPage);
             const paginationDiv = document.getElementById('pagination');
             paginationDiv.innerHTML = '';
 
-            if (currentPage > 5) {
+            if (currentPage > 1) {
                 const prevPageButton = document.createElement('span');
                 prevPageButton.textContent = '<';
                 prevPageButton.classList.add('page-number');
                 prevPageButton.onclick = function() {
-                    currentPage -= 5;
+                    currentPage--;
+                    if (currentSearchData.length > 0) {
+                        displayModels(currentSearchData);
+                    } else {
+                        displayModels(modelsData);
+                    }
                     renderPagination(totalItems);
                 };
                 paginationDiv.appendChild(prevPageButton);
@@ -110,17 +115,22 @@
                     } else {
                         displayModels(modelsData);
                     }
-                    renderPagination(totalItems); 
+                    renderPagination(totalItems);
                 };
                 paginationDiv.appendChild(pageButton);
             }
 
-            if (currentPage < numPages && numPages > 5) {
+            if (currentPage < numPages) {
                 const nextPageButton = document.createElement('span');
                 nextPageButton.textContent = '>';
                 nextPageButton.classList.add('page-number');
                 nextPageButton.onclick = function() {
-                    currentPage += 5;
+                    currentPage++;
+                    if (currentSearchData.length > 0) {
+                        displayModels(currentSearchData);
+                    } else {
+                        displayModels(modelsData);
+                    }
                     renderPagination(totalItems);
                 };
                 paginationDiv.appendChild(nextPageButton);
@@ -128,43 +138,28 @@
         }
 
         function searchModels() {
-    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-    if (searchTerm === '') {
-        displayModels(modelsData);
-        return;
-    }
-    
-    currentSearchData = modelsData.filter(model => {
-        const modelWords = model[0].toLowerCase().split(' ');
-        return modelWords.includes(searchTerm);
-    });
-    
- 
-    currentSearchData.sort((a, b) => {
-        const aMatchCount = a[0].toLowerCase().split(' ').filter(word => word.includes(searchTerm)).length;
-        const bMatchCount = b[0].toLowerCase().split(' ').filter(word => word.includes(searchTerm)).length;
-
-        
-        if (aMatchCount !== bMatchCount) {
-            return bMatchCount - aMatchCount; 
-        } else {
-            
-            const aIndex = a[0].toLowerCase().indexOf(searchTerm);
-            const bIndex = b[0].toLowerCase().indexOf(searchTerm);
-
-    
-            if (aIndex === bIndex) {
-                return a[0].localeCompare(b[0]);
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (searchTerm === '') {
+                currentSearchData = []; // Reset currentSearchData when search input is cleared
+                displayModels(modelsData);
+                return;
             }
-            return aIndex - bIndex;
+            
+            currentSearchData = modelsData.filter(model => {
+                const modelChars = model[0].toLowerCase();
+                return modelChars.includes(searchTerm);
+            });
+            
+            // Sort search results by relevance (number of occurrences of search term)
+            currentSearchData.sort((a, b) => {
+                const aCount = (a[0].match(new RegExp(searchTerm, "gi")) || []).length;
+                const bCount = (b[0].match(new RegExp(searchTerm, "gi")) || []).length;
+                return bCount - aCount;
+            });
+            
+            currentPage = 1;
+            displayModels(currentSearchData);
         }
-    });
-    
-    currentPage = 1;
-    displayModels(currentSearchData);
-}
-
-
 
         function copyToClipboard(text) {
             const el = document.createElement('textarea');
@@ -176,12 +171,7 @@
             alert('URL copied to clipboard!');
         }
 
-        document.getElementById('searchInput').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); 
-                searchModels(); 
-            }
-        });
+        document.getElementById('searchInput').addEventListener('input', searchModels);
 
         window.onload = fetchModelsData;
     </script>
