@@ -130,6 +130,15 @@
         function searchModels() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             currentSearchData = modelsData.filter(model => model[0].toLowerCase().includes(searchTerm));
+            // Sort the results based on relevance
+            currentSearchData.sort((a, b) => {
+                const aIndex = a[0].toLowerCase().indexOf(searchTerm);
+                const bIndex = b[0].toLowerCase().indexOf(searchTerm);
+                if (aIndex === bIndex) {
+                    return a[0].localeCompare(b[0]);
+                }
+                return aIndex - bIndex;
+            });
             currentPage = 1;
             displayModels(currentSearchData);
         }
